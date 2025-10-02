@@ -1,0 +1,96 @@
+﻿<Window x:Class="ToolKIT.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ToolKIT"
+        xmlns:propGrid="clr-namespace:ToolKIT.PropertyGrid"
+        xmlns:converter="clr-namespace:ToolKIT.ValueConverters"
+        mc:Ignorable="d"
+        Title="MainWindow">
+
+    <Window.DataContext>
+        <local:MainWindowVM />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/PropertyGrid/PropertyResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converter:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <ListView ItemsSource="{Binding Properties}"
+                  BorderThickness="0"
+                  BorderBrush="Transparent"
+                  HorizontalContentAlignment="Stretch"
+                  Padding="0"
+                  Margin="0">
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="{x:Type propGrid:PropertyValueVM}">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{Binding PropertyHeaderWidth, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0"
+                               
+                               Background="LightGray"
+                               Content="{Binding Name}" />
+
+                        <ContentPresenter Grid.Column="1"
+                                          Content="{Binding}"
+                                          IsEnabled="{Binding IsReadonly, Converter={StaticResource InverseBooleanConverter}}"
+                                          VerticalAlignment="Center" />
+
+                        <CheckBox Grid.Column="2"
+                                  IsEnabled="False"
+                                  IsChecked="{Binding ValueSource, Mode=OneWay}"
+                                  VerticalAlignment="Center" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+            <ListView.Template>
+                <ControlTemplate TargetType="{x:Type ListView}">
+                    <Border x:Name="Bd"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}"
+                            Padding="0"
+                            SnapsToDevicePixels="True">
+                        <ScrollViewer Focusable="False"
+                                      Padding="{TemplateBinding Padding}">
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ListView.Template>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Padding"
+                            Value="0" />
+                    <Setter Property="BorderThickness"
+                            Value="0" />
+                    <Setter Property="BorderBrush"
+                            Value="Transparent" />
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+
+        <Canvas Margin="0">
+            <GridSplitter Width="1"
+                          Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}}"
+                          Background="Black"
+                          Canvas.Left="{Binding PropertyHeaderWidth, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                          DragDelta="GridSplitter_DragDelta" />
+        </Canvas>
+    </Grid>
+</Window>
