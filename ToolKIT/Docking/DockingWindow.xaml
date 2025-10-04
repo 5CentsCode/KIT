@@ -168,4 +168,8 @@
         </DockPanel>
     </Grid>
     -->
+
+    <i:Interaction.Behaviors>
+        <dockBehaviors:WindowCloseBehavior ShouldClose="{Binding ShouldClose}" />
+    </i:Interaction.Behaviors>
 </Window>

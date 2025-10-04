@@ -13,7 +13,15 @@ public static class GenericExtensions
 
     public static T? ThrowIfNotType<T>(this object obj, [CallerArgumentExpression(nameof(obj))] string? name = null)
     {
-        obj?.GetType().ThrowIfNotType<T>(name);
+        try
+        {
+            obj?.GetType().ThrowIfNotType<T>();
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"{name} wrong type", e);
+
+        }
         return (T?)obj;
     }
 }

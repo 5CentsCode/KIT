@@ -74,17 +74,28 @@ internal class TabControlFloatTabItemBehavior : Behavior<TabControl>
 
             if (!elementRect.Contains(currentPosition))
             {
+                object selectedContent = selectedTabItem.Content;
+                if (AssociatedObject.ItemsSource is IList itemsSourceList)
+                {
+                    int selectIndex = Math.Max(0, AssociatedObject.SelectedIndex - 1);
+                    if (AssociatedObject.Items.Count <= 1)
+                    {
+                        selectIndex = -1;
+
+                        // Setting the template to null is a hack
+                        // to prevent "Cannot find source for binding" error.
+                        selectedTabItem.Template = null;
+                    }
+
+                    AssociatedObject.SelectedIndex = selectIndex;
+                    itemsSourceList.Remove(selectedContent);
+                }
+
                 // TODO: Add to Docking Manager.
-                DockingContainerVM dockingContainer = new DockingContainerVM(selectedTabItem.Content);
+                DockingContainerVM dockingContainer = new DockingContainerVM(selectedContent);
                 DockingWindow window = new DockingWindow();
                 window.DataContext = dockingContainer;
                 window.Show();
-
-                if (AssociatedObject.ItemsSource is IList itemsSourceList)
-                {
-                    itemsSourceList.RemoveAt(AssociatedObject.SelectedIndex);
-                    AssociatedObject.SelectedIndex = Math.Max(0, AssociatedObject.SelectedIndex - 1);
-                }
 
                 m_draggingTabItem = false;
                 AssociatedObject.ReleaseMouseCapture();
