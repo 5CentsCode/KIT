@@ -11,10 +11,12 @@ internal class TabControlFloatTabItemBehavior : Behavior<TabControl>
 {
     private readonly Size m_dragDistance = new Size(SystemParameters.MinimumHorizontalDragDistance * 8.0d, SystemParameters.MinimumVerticalDragDistance * 8.0d);
 
+    private Point? m_relativeStartDragPosition;
     private bool m_draggingTabItem;
 
     public TabControlFloatTabItemBehavior()
     {
+        m_relativeStartDragPosition = null;
         m_draggingTabItem = false;
     }
 
@@ -42,7 +44,7 @@ internal class TabControlFloatTabItemBehavior : Behavior<TabControl>
 
     private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        IEnumerable<TabItem> tabItems = AssociatedObject.GetChildrenOfType<TabItem>();
+        IEnumerable<TabItem> tabItems = AssociatedObject.GetVisualChildrenOfType<TabItem>();
 
         foreach (TabItem tabItem in tabItems)
         {
@@ -52,6 +54,7 @@ internal class TabControlFloatTabItemBehavior : Behavior<TabControl>
             m_draggingTabItem = elementRect.Contains(relativePosition);
             if (m_draggingTabItem)
             {
+                m_relativeStartDragPosition = relativePosition;
                 break;
             }
         }
@@ -60,12 +63,13 @@ internal class TabControlFloatTabItemBehavior : Behavior<TabControl>
     private void OnPreviewMouseMove(object sender, MouseEventArgs e)
     {
         if (m_draggingTabItem &&
+            m_relativeStartDragPosition != null &&
             e.LeftButton == MouseButtonState.Pressed)
         {
             AssociatedObject.CaptureMouse();
 
             int selectedIndex = AssociatedObject.SelectedIndex;
-            TabItem selectedTabItem = AssociatedObject.GetChildrenOfType<TabItem>()
+            TabItem selectedTabItem = AssociatedObject.GetVisualChildrenOfType<TabItem>()
                 .First(tabItem => tabItem.Content == AssociatedObject.SelectedContent);
 
             Rect elementRect = new Rect(new Point(0, 0), selectedTabItem.RenderSize);
@@ -91,14 +95,19 @@ internal class TabControlFloatTabItemBehavior : Behavior<TabControl>
                     itemsSourceList.Remove(selectedContent);
                 }
 
+                m_draggingTabItem = false;
+                AssociatedObject.ReleaseMouseCapture();
+
                 // TODO: Add to Docking Manager.
                 DockingContainerVM dockingContainer = new DockingContainerVM(selectedContent);
                 DockingWindow window = new DockingWindow();
                 window.DataContext = dockingContainer;
                 window.Show();
 
-                m_draggingTabItem = false;
-                AssociatedObject.ReleaseMouseCapture();
+                WindowTabItemDragBehavior behavior = new WindowTabItemDragBehavior(m_relativeStartDragPosition.Value);
+                window.AddBehavior(behavior);
+
+                m_relativeStartDragPosition = null;
             }
         }
     }

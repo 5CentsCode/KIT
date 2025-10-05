@@ -33,7 +33,7 @@ internal class TabControlReorderTabItemBehavior : Behavior<TabControl>
         if (e.LeftButton == MouseButtonState.Pressed)
         {
             int selectedIndex = AssociatedObject.SelectedIndex;
-            TabItem? selectedTabItem = AssociatedObject.GetChildrenOfType<TabItem>()
+            TabItem? selectedTabItem = AssociatedObject.GetVisualChildrenOfType<TabItem>()
                 .FirstOrDefault(tabItem => tabItem.Content == AssociatedObject.SelectedContent);
             if (selectedTabItem == null)
             {
