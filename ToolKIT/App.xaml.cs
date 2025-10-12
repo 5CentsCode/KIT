@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Windows;
+using System.Windows.Input;
 using ToolKIT.Docking;
 using ToolKIT.LogViewer;
 using ToolKIT.Services.Dialog;
@@ -14,6 +15,7 @@ using ToolKIT.Services.LogService.LogEvent;
 using ToolKIT.Services.LogService.LogFile;
 using Environment = ToolKIT.Services.EnvironmentService.Environment;
 using HHost = Microsoft.Extensions.Hosting.Host;
+using InteropMouse = KIT.Interop.Mouse;
 
 namespace ToolKIT;
 
@@ -29,6 +31,8 @@ public partial class App : Application
 
     public App()
     {
+        // InteropMouse.AddMouseEventHandler(this.OnMouseMove);
+
         m_host = HHost.CreateDefaultBuilder()
             .ConfigureAppConfiguration((context, config) =>
             {
@@ -78,5 +82,16 @@ public partial class App : Application
 
         IDialogService dialogService = m_serviceProvider.GetRequiredService<IDialogService>();
         dialogService.Show<DockingWindow>();
+    }
+
+    private void OnMouseMove(object sender, MouseEventArgs e)
+    {
+        m_log.LogTrace($"{InteropMouse.GetPosition()}");
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        // InteropMouse.RemoveMouseEventHandler(OnMouseMove);
+        base.OnExit(e);
     }
 }

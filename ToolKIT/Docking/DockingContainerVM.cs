@@ -38,6 +38,7 @@ public class DockingContainerVM : BaseVM, IDisposable
     public void Dispose()
     {
         DockedPanelTitles.CollectionChanged -= OnCollectionChanged;
+        GC.SuppressFinalize(this);
     }
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

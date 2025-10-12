@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ToolKIT.Extensions;
+using InteropMouse = KIT.Interop.Mouse;
 
 namespace ToolKIT.Docking.Behaviors;
 internal class WindowTabItemDragBehavior : Behavior<Window>
@@ -19,8 +20,8 @@ internal class WindowTabItemDragBehavior : Behavior<Window>
     protected override void OnAttached()
     {
         AssociatedObject.CaptureMouse();
-        AssociatedObject.MouseMove += OnMouseMove;
         AssociatedObject.MouseLeftButtonUp += OnLeftMouseButtonUp;
+        InteropMouse.AddMouseEventHandler(OnMouseMove);
 
         IEnumerable<TabItem> tabItems = AssociatedObject.GetVisualChildrenOfType<TabItem>();
         m_dragTab = tabItems.FirstOrDefault();
@@ -31,8 +32,8 @@ internal class WindowTabItemDragBehavior : Behavior<Window>
     protected override void OnDetaching()
     {
         AssociatedObject.ReleaseMouseCapture();
-        AssociatedObject.MouseMove -= OnMouseMove;
         AssociatedObject.MouseLeftButtonUp -= OnLeftMouseButtonUp;
+        InteropMouse.RemoveMouseEventHandler(OnMouseMove);
         base.OnDetaching();
     }
 
@@ -45,9 +46,9 @@ internal class WindowTabItemDragBehavior : Behavior<Window>
     {
         m_dragTab.ThrowIfNull();
 
-        Point currentDragScreenPosition = m_dragTab.PointToScreen(Mouse.GetPosition(m_dragTab));
+        Point mousePosition = InteropMouse.GetPosition();
         Point expectedDragScreenPosition = m_dragTab.PointToScreen(m_tabRelativeDragPosition);
-        Vector dragDelta = currentDragScreenPosition - expectedDragScreenPosition;
+        Vector dragDelta = mousePosition - expectedDragScreenPosition;
 
         AssociatedObject.Left += dragDelta.X;
         AssociatedObject.Top += dragDelta.Y;

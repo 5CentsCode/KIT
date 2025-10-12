@@ -35,4 +35,8 @@
     <Folder Include="Services\Configs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\KIT.Interop\KIT.Interop.csproj" />
+  </ItemGroup>
+
 </Project>

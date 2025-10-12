@@ -4,7 +4,7 @@ using ToolKIT.Extensions;
 namespace ToolKitTests.Extensions;
 public class IListExtensionTests
 {
-    private IList list = new List<int>() { 1, 2, 3 };
+    private readonly IList m_list = new List<int>() { 1, 2, 3 };
 
     [Theory]
     [InlineData(-1, 0)]
@@ -14,7 +14,7 @@ public class IListExtensionTests
     public void Swap_IndexOutOfRange_ThrowsException(int indexA, int indexB)
     {
         // Arrange + Act + Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => list.Swap(indexA, indexB));
+        Assert.Throws<ArgumentOutOfRangeException>(() => m_list.Swap(indexA, indexB));
     }
 
     [Theory]
@@ -25,13 +25,13 @@ public class IListExtensionTests
     public void Swap_IndexesInRange_IndicesSwapped(int indexA, int indexB)
     {
         // Arrange
-        IList originalList = list.Cast<int>().ToList();
+        IList originalList = m_list.Cast<int>().ToList();
 
         // Act
-        list.Swap(indexA, indexB);
+        m_list.Swap(indexA, indexB);
 
         // Assert
-        Assert.Equal(originalList[indexA], list[indexB]);
-        Assert.Equal(originalList[indexB], list[indexA]);
+        Assert.Equal(originalList[indexA], m_list[indexB]);
+        Assert.Equal(originalList[indexB], m_list[indexA]);
     }
 }
